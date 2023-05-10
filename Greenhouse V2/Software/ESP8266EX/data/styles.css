@@ -1,0 +1,228 @@
+
+body{
+	margin:0px;
+	font-family: Arial, sans-serif;
+}
+
+header{
+	background-color:rgba(0,0,0,.05);
+	display:flex;
+	flex-flow:column;
+	align-items:center;
+	justify-content:center;
+	/*height:50;*/
+	box-shadow: rgba(0,0,0,.05) 0px 1px 2px 0px, rgba(0,0,0,.05) 0px 1px 4px 0px, rgba(0,0,0,.05) 0px 2px 8px 0px;
+}
+
+.topBar{
+	display:flex;
+	align-items:center;
+	justify-content: center;
+	height: 50px;
+	width: 100%;
+	background-color: #00cb00;
+}
+
+.topBar div{
+	color: white;
+}
+
+.headerNav{
+	width:340px;
+	height: 50px;
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+}
+
+.headerNav a{
+	width: 80px;
+	color:black;
+	border: 1px solid rgb(0 0 0 / 30%);
+	border-radius:16px;
+	padding:5px;
+	text-align: center;
+	text-decoration:none;
+	box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 0px;
+}
+
+#timeBlock, #addBlock{
+	margin-top: 10px;
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+	border: 1px solid rgb(0 0 0 / 15%);
+	border-radius: 100px 100px 0px 0px;
+	background-color: #00cb00;
+	box-shadow: rgb(0 0 0 / 5%) 0px -1px 2px 0px, rgb(0 0 0 / 5%) 0px -1px 2px 0px;
+	padding: 10px 0px 5px 0px;
+	margin-bottom:1px;
+	cursor:pointer;
+	color:white;
+}
+
+#timeBlock {
+	height:54px;
+}
+
+#timeBlock:hover{
+	cursor:pointer;
+}
+
+#timeBlock div{
+	color:white;
+}
+
+.button{
+	background-color: white;
+	color:black;
+	border: 1px solid rgb(0 0 0 / 30%);
+	border-radius:16px;
+	padding:5px;
+	text-align: center;
+	text-decoration:none;
+	box-shadow: rgb(0 0 0 / 5%) 0px 0px 2px 0px;
+	cursor:pointer;
+}
+
+.button.active{
+	background-color: #00cb00;
+}
+
+.button.active div{
+	color: white;
+}
+
+.mainBodyBlock{
+	height:100%;
+	/*padding-top:5px;*/
+	/*margin-top:14px;*/
+	background-color: rgba(0,0,0,.05);
+	/*box-shadow: rgb(0 0 0 / 5%) 0px -1px 2px 0px, rgb(0 0 0 / 5%) 0px -1px 4px 0px, rgb(0 0 0 / 5%) 0px -2px 8px 0px;
+	*/
+}
+
+.mainBodyBlockTitle{
+	font-size: 22px;
+	width: 180px;
+	height:40;
+	background-color:white;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	border-top: 1px solid rgb(0 0 0 / 30%);
+	border-right: 1px solid rgb(0 0 0 / 30%);
+	border-bottom: 1px solid rgb(0 0 0 / 30%);
+}
+
+.mainBodyBlockInfoContainer{
+	display:flex;
+	flex-flow:column;
+	align-items:center;
+	width:100%;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	
+	
+}
+
+.mainBodyBlockInfo{
+	width:100%;
+	height:100px;
+	background-color:white;
+}
+
+#profileView{
+	display:flex;
+	flex-flow:row;
+	justify-content:center;
+}
+
+#profileView div{
+	background-color:white;
+	padding:5px 0px;
+	width: 33.333%;
+	text-align:center;
+	
+}
+
+#profileView div.active{
+	background-color:#00cb00;
+	color:white;
+}
+
+table{
+	border-collapse:collapse;
+}
+th, tr, td {
+	height:46px;
+	text-align:left;
+	border: 1px solid lightgray;
+	width: 50%;
+	padding: 0px 10px;
+}
+
+.warning {
+	background-color: #ff000033;
+}
+
+.plantProfileConfig{
+	display: flex;
+	flex-flow: wrap;
+	margin-block-end:0px;
+	justify-content:space-evenly;
+	max-width:640px;
+}
+
+.inputBlock{
+	margin:10px;
+	width: 300px;
+}
+
+.inputBlock input{
+	width:100%;
+}
+
+.plantProfileConfigButtons{
+	display: flex;
+	flex-flow:row;
+	justify-content: space-between;
+	max-width:640px;
+}
+
+.plantProfileConfigButtonsBlock{
+	width:100%;
+	display:flex;
+	justify-content:center;
+}
+
+.mainBodyBlock form{
+	display:flex;
+	flex-flow:column;
+	align-items:center;
+}
+
+#system_num_error{
+	display: none;
+	font-size:12px;
+	color:red;
+}
+
+.options_buttons{
+	display:flex;
+	flex-flow:row;
+	justify-content:space-around;
+	width:100%;
+}
+
+.options_buttons input{
+	width:70px;
+}
+
+.noProfileBlock {
+	display:none;
+	background-color: rgba(0,0,0,.05);
+	text-align: center;
+	width: 100%;
+	height: 200px;
+}

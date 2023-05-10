@@ -1,0 +1,272 @@
+sensors = [{
+    "system_num": 0,
+    "sensor_num": 1,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 1,
+    "sensor_num": 2,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 1,
+    "sensor_num": 3,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 1,
+    "sensor_num": 4,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 1,
+    "sensor_num": 5,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 1,
+    "sensor_num": 1,
+    "sensor_type": 1,
+    "driver_up_num": 1,
+    "driver_up_input_num": 1,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 1000,
+    "max_level": 0,
+    "min_level": 4000
+}, {
+    "system_num": 1,
+    "sensor_num": 1,
+    "sensor_type": 2,
+    "driver_up_num": 1,
+    "driver_up_input_num": 2,
+    "driver_down_num": 1,
+    "driver_down_input_num": 3,
+    "current_level": 29000,
+    "max_level": 31831,
+    "min_level": 28086
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}, {
+    "system_num": 4,
+    "sensor_num": 0,
+    "sensor_type": 0,
+    "driver_up_num": 0,
+    "driver_up_input_num": 0,
+    "driver_down_num": 0,
+    "driver_down_input_num": 0,
+    "current_level": 0,
+    "max_level": 0,
+    "min_level": 0
+}];
+plant_profiles = [{
+    "name": "Broccoli",
+    "system_num": 1,
+    "tds_min": 4000,
+    "ph_max": 31831,
+    "ph_min": 28086
+}, {
+    "name": "Broccoli",
+    "system_num": 2,
+    "tds_min": 4000,
+    "ph_max": 31831,
+    "ph_min": 28086
+}, {
+    "name": "Broccoli",
+    "system_num": 3,
+    "tds_min": 4000,
+    "ph_max": 31831,
+    "ph_min": 28086
+}, {
+    "name": "",
+    "system_num": 0,
+    "tds_min": 0,
+    "ph_max": 0,
+    "ph_min": 0
+}, {
+    "name": "",
+    "system_num": 0,
+    "tds_min": 0,
+    "ph_max": 0,
+    "ph_min": 0
+}, {
+    "name": "",
+    "system_num": 0,
+    "tds_min": 0,
+    "ph_max": 0,
+    "ph_min": 0
+}, {
+    "name": "",
+    "system_num": 0,
+    "tds_min": 0,
+    "ph_max": 0,
+    "ph_min": 0
+}, {
+    "name": "",
+    "system_num": 0,
+    "tds_min": 0,
+    "ph_max": 0,
+    "ph_min": 0
+}, {
+    "name": "",
+    "system_num": 0,
+    "tds_min": 0,
+    "ph_max": 0,
+    "ph_min": 0
+}, {
+    "name": "",
+    "system_num": 0,
+    "tds_min": 0,
+    "ph_max": 0,
+    "ph_min": 0
+}];
+lastUpdated = 29140

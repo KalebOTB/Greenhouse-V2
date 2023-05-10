@@ -1,0 +1,273 @@
+<html>
+	<head>
+		<title>Greenhouse</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0;"/>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<script src="vars.js"></script>
+		<link rel="icon" type="image/x-icon" href="favicon.ico">
+	</head>
+	<body>
+		<header>
+			<div class="topBar"><img src="favicon.png" height="32" width="32" ></div>
+			<div class="headerNav">
+				<a class="button active" href=""><div>Home</div></a>
+				<a class="button" href="config.html"><div>Configure</div></a>
+				<a class="button" href="/about"><div>About</div></a>
+			</div>
+		</header>
+		<div id="timeBlock" onclick="updateSensorData()">
+			<div>Last Updated</div>
+			<div class="time" data-time="0"></div>
+			<div id="systemTitle"></div>
+		</div>
+		<div class="noProfileBlock">
+			No Profile Configured
+		</div>
+		<div class="mainBodyBlock">
+			<div class="mainBodyBlockTitle">
+				<div>Liquid Levels</div>
+			</div>
+			<!-- MOVEEEEEEEEE -->
+			<div class="mainBodyBlockInfoContainer">
+				<table id="reservoirTable" class="mainBodyBlockInfo">
+					<tr>
+						<th>Sensor</th>
+						<th>Value</th>
+					</tr>
+				</table>
+			</div>
+			<div class="mainBodyBlockTitle">
+				<div>TDS Level</div>
+			</div>
+			<div class="mainBodyBlockInfoContainer">
+				<table id="tdsTable" class="mainBodyBlockInfo">
+					<tr>
+						<th>Sensor</th>
+						<th>Value</th>
+					</tr>
+				</table>
+			</div>
+			<div class="mainBodyBlockTitle">
+				<div>pH Level</div>
+			</div>
+			<div class="mainBodyBlockInfoContainer">
+				<table id="pHTable" class="mainBodyBlockInfo">
+					<tr>
+						<th>Sensor</th>
+						<th>Value</th>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+	<!--Scripts placed at bottom to allow DOM to load-->
+	<script>
+		<!--var times=[%pHTime%,%tdsTime%,%nutrientReservoirTime%];-->
+		var times=[0,0,0];
+		var number_of_systems=0;
+		for (var i=0;i<19;i++){
+			if(sensors[i]["system_num"]==4) break;
+			number_of_systems +=1;
+		}
+		if(number_of_systems > 0) number_of_systems = (number_of_systems-1)/6;
+		function initTimes(){
+			var timeList = document.getElementsByClassName("time");
+			for(var i=0;i<timeList.length;i++){
+				timeList[i].dataset.time = lastUpdated;
+			}
+		}
+		initTimes();
+		setInterval(function(){
+			increaseTime();
+		},1000);
+	
+		setInterval(function(){
+			getSensorData();
+		},60000);
+		function increaseTime(){
+			var timeList = document.getElementsByClassName("time");
+			for(var i=0;i<timeList.length;i++){
+				var time = timeList[i].dataset.time;
+				timeList[i].dataset.time = +time + 1000;
+				time = Math.floor(timeList[i].dataset.time/1000);
+				if(time >= 60) time = time/60;
+				else{
+					timeList[i].innerHTML = Math.ceil(time)+"s ago";
+					continue;
+				}if(time >= 60) time = time/60;
+				else{
+					timeList[i].innerHTML = Math.floor(time)+"m ago";
+					continue;
+				}if(time >= 24) time = time/24;
+				else{
+					timeList[i].innerHTML = Math.floor(time)+"h ago";
+					continue;
+				}
+				timeList[i].innerHTML = Math.floor(time)+"d ago";
+			}
+		}
+		
+		function binaryToText(bit){
+			return bit == 0 ? "Low" : "High";
+		}
+		
+		var reservoir_titles = ["Rainwater","System","Nutrient","pH Up","pH Down"];
+		var sensors_max=19;
+		var float_sensor=0;
+		var tds_sensor=1;
+		var ph_sensor=2;
+		function initSensorValues(){
+			var reservoir_table = document.getElementById("reservoirTable");
+			var ph_table = document.getElementById("pHTable");
+			var tds_table = document.getElementById("tdsTable");
+			var system_title = document.getElementById("systemTitle");
+			var lock = 1;
+			for(var i=0;i<10;i++){
+				if(plant_profiles[i]["system_num"]==1){
+					systemTitle.innerHTML = plant_profiles[i]["name"];
+					lock = 0;
+				}
+			}
+			for(var i=0;i<sensors_max;i++){
+				if(sensors[i]["system_num"]<=number_of_systems){
+					if(sensors[i]["sensor_type"]==float_sensor){
+						var row_class="";
+						row_class=sensors[i].current_level == 0 ? "warning" : " ";
+						var row_title;
+						if(sensors[i]["sensor_num"]==0) {
+							row_title=reservoir_titles[0];
+						}
+						else {
+							row_title=reservoir_titles[(sensors[i]["sensor_num"]-2 % 4) + 1];
+						}
+						row_class+=" system"+sensors[i]["system_num"];
+						reservoir_table.innerHTML += "<tr class='"+row_class+"' data-sensorIdClass=''><td>"+row_title+"</td><td data-sensorIdLevel=''>"+binaryToText(sensors[i].current_level)+"</td></tr>";
+					}else if(sensors[i]["sensor_type"]==ph_sensor){
+						var row_class="";
+						row_class=(sensors[i].current_level > sensors[i]["max_level"] || sensors[i].current_level < sensors[i]["min_level"] ) ? "warning" : " ";
+						row_class+=" system"+sensors[i]["system_num"];
+						ph_table.innerHTML += "<tr class='"+row_class+"' data-sensorIdClass=''><td>pH</td><td data-sensorIdLevel=''>"+pHShortToFloat(sensors[i].current_level)+"</td></tr>"; 
+					}else if(sensors[i]["sensor_type"]==tds_sensor){
+						var row_class="";
+						row_class=(sensors[i].current_level < sensors[i]["min_level"] ) ? "warning" : " ";
+						row_class+=" system"+sensors[i]["system_num"];
+						tds_table.innerHTML += "<tr class='"+row_class+"' data-sensorIdClass=''><td>TDS</td><td data-sensorIdLevel=''>"+((sensors[i].current_level/65535)*100000).toFixed(0)+"</td></tr>"; 
+					}
+				}
+			}
+			if(lock){
+				document.getElementsByClassName("noProfileBlock")[0].style.display = "block";
+				document.getElementsByClassName("mainBodyBlock")[0].style.display = "none";
+			}else{
+				document.getElementsByClassName("noProfileBlock")[0].style.display = "none";
+				document.getElementsByClassName("mainBodyBlock")[0].style.display = "block";
+			}
+		}
+		
+		function initPlantProfiles(){
+			var profile_table = document.getElementById("profileView");
+			var sys1;
+			var sys2;
+			var sys3;
+			var count=0;
+			for(var i=0;i<10;i++){
+				
+			}
+		}
+		
+		function pHShortToFloat(ph_short){
+			return ((ph_short/65535)*14).toFixed(2);
+		}
+		
+		function updateSensorData(){
+			const xhttp = new XMLHttpRequest();
+			xhttp.onload = function(){
+				var obj = JSON.parse(this.responseText);
+				sensors = obj[0];
+				var dom_sensors_level=document.querySelectorAll('[data-sensorIdLevel]');
+				var dom_sensors_class=document.querySelectorAll('[data-sensorIdClass]');
+				var lock = 1;
+				for(var i=0;i<10;i++){
+					if(plant_profiles[i]["system_num"]==1){
+						systemTitle.innerHTML = plant_profiles[i]["name"];
+						lock = 0;
+					}
+				}
+				for(var i=0;i<sensors_max;i++){
+					if(sensors[i]["system_num"]<=number_of_systems){
+						if(sensors[i]["sensor_type"]==float_sensor){
+							sensors[i].current_level == 0 ? dom_sensors_class[i].classList.add("warning") : dom_sensors_class[i].classList.remove("warning");
+							dom_sensors_level[i].innerHTML=binaryToText(sensors[i].current_level);
+						}else if(sensors[i]["sensor_type"]==ph_sensor){
+							(sensors[i].current_level > sensors[i]["max_level"] || sensors[i].current_level < sensors[i]["min_level"] ) ? dom_sensors_class[i].classList.add("warning") : dom_sensors_class[i].classList.remove("warning");
+							dom_sensors_level[i].innerHTML=pHShortToFloat(sensors[i].current_level);
+						}else if(sensors[i]["sensor_type"]==tds_sensor){
+							(sensors[i].current_level < sensors[i]["min_level"] ) ? dom_sensors_class[i].classList.add("warning") : dom_sensors_class[i].classList.remove("warning");
+							dom_sensors_level[i].innerHTML=((sensors[i].current_level/65535) * 100000).toFixed(0);
+
+						}
+					}
+				}
+				if(lock){
+					document.getElementsByClassName("noProfileBlock")[0].style.display = "block";
+					document.getElementsByClassName("mainBodyBlock")[0].style.display = "none";
+				}else{
+					document.getElementsByClassName("noProfileBlock")[0].style.display = "none";
+					document.getElementsByClassName("mainBodyBlock")[0].style.display = "block";
+				}
+				//console.log(dom_sensors);
+				plant_profiles = obj[1];
+				lastUpdated = obj[2];
+				initTimes();
+			}
+			xhttp.open("GET","updateSensorData",true);
+			xhttp.send();
+		}
+		function getSensorData(){
+			const xhttp = new XMLHttpRequest();
+			xhttp.onload = function(){
+				var obj = JSON.parse(this.responseText);
+				sensors = obj[0];
+				var dom_sensors_level=document.querySelectorAll('[data-sensorIdLevel]');
+				var dom_sensors_class=document.querySelectorAll('[data-sensorIdClass]');
+				var lock = 1;
+				for(var i=0;i<10;i++){
+					if(plant_profiles[i]["system_num"]==1){
+						systemTitle.innerHTML = plant_profiles[i]["name"];
+						lock = 0;
+					}
+				}
+				for(var i=0;i<sensors_max;i++){
+					if(sensors[i]["system_num"]<=number_of_systems){
+						if(sensors[i]["sensor_type"]==float_sensor){
+							sensors[i].current_level == 0 ? dom_sensors_class[i].classList.add("warning") : dom_sensors_class[i].classList.remove("warning");
+							dom_sensors_level[i].innerHTML=binaryToText(sensors[i].current_level);
+						}else if(sensors[i]["sensor_type"]==ph_sensor){
+							(sensors[i].current_level > sensors[i]["max_level"] || sensors[i].current_level < sensors[i]["min_level"] ) ? dom_sensors_class[i].classList.add("warning") : dom_sensors_class[i].classList.remove("warning");
+							dom_sensors_level[i].innerHTML=pHShortToFloat(sensors[i].current_level);
+						}else if(sensors[i]["sensor_type"]==tds_sensor){
+							(sensors[i].current_level < sensors[i]["min_level"] ) ? dom_sensors_class[i].classList.add("warning") : dom_sensors_class[i].classList.remove("warning");
+							dom_sensors_level[i].innerHTML=((sensors[i].current_level/65535) * 100000).toFixed(0);
+
+						}
+					}
+				}
+				if(lock){
+					document.getElementsByClassName("noProfileBlock")[0].style.display = "block";
+					document.getElementsByClassName("mainBodyBlock")[0].style.display = "none";
+				}else{
+					document.getElementsByClassName("noProfileBlock")[0].style.display = "none";
+					document.getElementsByClassName("mainBodyBlock")[0].style.display = "block";
+				}
+				//console.log(dom_sensors);
+				plant_profiles = obj[1];
+				lastUpdated = obj[2];
+				initTimes();
+			}
+			xhttp.open("GET","getSensorData",true);
+			xhttp.send();
+		}
+		initSensorValues();
+	
+		</script>
+</html>

@@ -1,0 +1,128 @@
+<html>
+	<head>
+		<title>Greenhouse</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0;"/>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<script src="vars.js"></script>
+		<link rel="icon" type="image/x-icon" href="favicon.ico">
+	</head>
+	<body>
+		<header>
+			<div class="topBar"><img src="favicon.png" height="32" width="32" ></div>
+			<div class="headerNav">
+				<a class="button" href="index.html"><div>Home</div></a>
+				<a class="button active" href="config.html"><div>Configure</div></a>
+				<a class="button" href="/about"><div>About</div></a>
+			</div>
+		</header>
+		<div class="mainBodyBlock">
+			<form>
+				<div class="plantProfileConfig">
+					<div class="inputBlock">
+						<label for="plant_name">Plant Name (25 Characters Max)</label>
+						<input value="" type="text" name="plant_name" />
+					</div>
+					<div class="inputBlock">
+						<label for="system_num">System Number</label>
+						<input value="" type="text" name="system_num" />
+						<!--* The system number (1-3) is already active. Use any other number to save this profile, or disable an active system to enable this one.-->
+						<label id="system_num_error"></label>
+					</div>
+					<div class="inputBlock">
+						<label for="tds_min">Minimum TDS Level</label>
+						<input value="" type="text" name="tds_min" />
+					</div>
+					<div class="inputBlock">
+						<label for="ph_max">Maximum pH Level</label>
+						<input value="" type="text" name="ph_max" />
+					</div>
+					<div class="inputBlock">
+						<label for="ph_min">Minimum pH Level</label>
+						<input value="" type="text" name="ph_min" />
+					</div>
+				</div>
+				<div class="plantProfileConfigButtonsBlock">
+					<div class="plantProfileConfigButtons">
+						<input class="button" value="Update" type="button" onclick="updateProfile()"/>
+					</div>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script>
+		var plant_profile_id=%id%;
+		var number_of_systems=0;
+		for (var i=0;i<19;i++){
+			if(sensors[i]["system_num"]==4) break;
+			number_of_systems +=1;
+		}
+		if(number_of_systems > 0) number_of_systems = (number_of_systems-1)/6;
+		var systems_str = number_of_systems > 1 ? "1-"+number_of_systems : "1";
+		document.getElementById("system_num_error").textContent = "* The system number ("+systems_str+") is already active. Use any other number to save this profile, or disable an active system to enable this one."
+		function pHShortToFloat(ph_short){
+			return ((ph_short/65535)*14).toFixed(2);
+		}
+		function pHFloatToShort(ph_float) {
+			return Number(((ph_float / 14)*65535).toFixed(0));
+		}
+		function updateProfile(){
+			var plant_name=document.getElementsByName("plant_name")[0].value;
+			if(plant_name=="") return;
+			var system_num=Number(document.getElementsByName("system_num")[0].value);
+			var tds_min=Number(((document.getElementsByName("tds_min")[0].value / 100000) * 65535).toFixed(0));
+			var ph_min=pHFloatToShort(Number(document.getElementsByName("ph_min")[0].value));
+			var ph_max=pHFloatToShort(Number(document.getElementsByName("ph_max")[0].value));
+			console.log(typeof plant_name,typeof system_num,typeof tds_min,typeof ph_min,typeof plant_profile_id);
+			console.log(plant_name,system_num,tds_min,ph_min);
+			var count=[];
+			var system_num_error="";
+			for(var i=0;i<10;i++){
+				//if(plant_profiles[i].system_num == 1 || plant_profiles[i].system_num == 2 || plant_profiles[i].system_num == 3){
+				if(plant_profiles[i].system_num > 0 && plant_profiles[i].system_num <= number_of_systems){
+					if(!count.includes(plant_profiles[i].system_num)) count.push(plant_profiles[i].system_num);
+				}
+			}
+			if(count.length <= number_of_systems && (!count.includes(system_num) || plant_profiles[plant_profile_id]["system_num"] == system_num)){
+				fetch('updateProfile',{
+					redirect: 'follow',
+					method:'POST',
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						"name": plant_name,
+						"tds_min":tds_min,
+						"ph_max":ph_max,
+						"ph_min":ph_min,
+						"system_num":system_num,
+						"id":plant_profile_id
+					})
+				})
+				.then(function(response){
+					if(response.status==200){
+						window.location.href="config.html";
+					}else{
+						console.log("ERROR");
+					}
+				});
+			}else{
+				document.getElementById("system_num_error").style.display="block";
+			}/*
+			.then(function(html){
+				document.open();
+				document.write(html);
+				document.close();
+			});*/
+		}
+		
+		function setup(){
+			document.getElementsByName("plant_name")[0].value=plant_profiles[plant_profile_id]["name"];
+			document.getElementsByName("system_num")[0].value=plant_profiles[plant_profile_id]["system_num"];
+			document.getElementsByName("tds_min")[0].value=((plant_profiles[plant_profile_id]["tds_min"] / 65535) * 100000).toFixed(0);
+			document.getElementsByName("ph_min")[0].value=pHShortToFloat(plant_profiles[plant_profile_id]["ph_min"]);
+			document.getElementsByName("ph_max")[0].value=pHShortToFloat(plant_profiles[plant_profile_id]["ph_max"]);
+		}
+		setup();
+	</script>
+</html>

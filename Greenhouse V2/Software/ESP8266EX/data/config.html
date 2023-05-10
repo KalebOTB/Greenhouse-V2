@@ -1,0 +1,109 @@
+<html>
+	<head>
+		<title>Greenhouse</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0;"/>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<script src="vars.js"></script>
+		<link rel="icon" type="image/x-icon" href="favicon.ico">
+	</head>
+	<body>
+		<header>
+			<div class="topBar"><img src="favicon.png" height="32" width="32" ></div>
+			<div class="headerNav">
+				<a class="button" href="index.html"><div>Home</div></a>
+				<a class="button active" href="config.html"><div>Configure</div></a>
+				<a class="button" href="/about"><div>About</div></a>
+			</div>
+		</header>
+		<div id="addBlock" onclick="addProfile()">
+			<div>Add Profile</div>
+		</div>
+		<div class="mainBodyBlock">
+			<div class="mainBodyBlockTitle">
+				<div>Plant Profiles</div>
+			</div>
+			<div class="mainBodyBlockInfoContainer">
+				<table id="profileTable" class="mainBodyBlockInfo">
+					<tr>
+						<th>Plant Name</th>
+						<th>Options</th>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+	<script>
+	var t
+	var number_of_systems=0;
+	for (var i=0;i<19;i++){
+		if(sensors[i]["system_num"]==4) break;
+		number_of_systems +=1;
+	}
+	if(number_of_systems > 0) number_of_systems = (number_of_systems-1)/6;
+		
+	function addProfile(){
+		for(var i=0;i<10;i++){
+			if(plant_profiles[i]["name"] == "") {
+				editProfile(i);
+				return;
+			}
+		}
+		console.log("Warning!!!!");
+	}
+	function editProfile(id){
+		fetch('editProfile',{
+			redirect: 'follow',
+			method:'POST',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ "id": id })
+		})
+		.then(function(response){
+			t=response;
+			console.log(response);
+			return response.text();
+		})
+		.then(function(html){
+			document.open();
+			document.write(html);
+			document.close();
+		});
+		//window.location.href="editProfile"
+	}
+	
+	function removeProfile(id){
+		fetch('removeProfile',{
+			redirect: 'follow',
+			method:'POST',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ "id": id })
+		})
+		.then(function(response){
+			window.location.reload();
+			return response.text();
+		});
+	}
+	
+	function initProfiles(){
+		var profile_table = document.getElementById("profileTable");
+		for(var i=0;i<10;i++){
+			if(plant_profiles[i]["name"] != ""){
+				var button=button = '<input class="button" type="button" value="Remove" onclick="removeProfile('+i+')"/>';
+				var row_class="warning"
+				if(plant_profiles[i].system_num >0 && plant_profiles[i].system_num <= number_of_systems){
+					//button = '<input class="button" type="button" value="Disable" onclick="disableProfile()"/>'
+					row_class="";
+				}
+				profile_table.innerHTML += "<tr class='"+row_class+"'><td>"+plant_profiles[i]["name"]+"</td><td><div class='options_buttons'>"+button+"<input class='button' type='button' value='Edit' onclick='editProfile("+i+")'/></div></td></tr>"
+			}
+		}
+	}
+	
+	initProfiles();
+	</script>
+</html>
