@@ -52,22 +52,36 @@ struct sensor{
     unsigned char sensor_type;
     unsigned char sensor_num;
     unsigned int min_timeout_ms;
+    unsigned int elapsed_timeout_ms;
     unsigned int current_level;
 };
 
-enum i2c_mode { TX, RX, TIMEOUT, IDLE};
-
+enum com_mode { TX, RX, TIMEOUT, IDLE};
+enum uart_error {
+    NONE,
+    TX_0,       //Tried to write to UCA1TXBUF while data is being transmitted
+    RX_TX_0,    //Tried to transmit while still recieving
+    RX_UNKNOWN, //Unknown command recieved
+};
 struct i2c{
     unsigned char system_num;
     unsigned char sensor_num;
     unsigned char addresses[3];
     unsigned char i2c_transmit_buffer[32];
     unsigned char i2c_recieve_buffer[32];
-    enum i2c_mode mode;
+    enum com_mode mode;
     unsigned char tx_count;
     unsigned char rx_count;
     unsigned char tx_idx;
     unsigned char rx_idx;
+};
+
+struct uart{
+    unsigned char data[301];
+    enum com_mode mode;
+    unsigned short idx;
+    unsigned short size;
+    enum uart_error error;
 };
 
 struct driver{
@@ -85,11 +99,14 @@ struct plant_profile active_profiles[MAX_SYSTEMS];
 struct sensor sensors[MAX_SENSORS];
 struct driver drivers[MAX_DRIVERS];
 struct i2c tds_i2c;
+struct uart esp_uart[2];
+struct uart *tx_esp_uart=&esp_uart[0];
+struct uart *rx_esp_uart=&esp_uart[1];
 volatile unsigned long driver_map[16][2];
 unsigned char system_data;
 unsigned char number_of_systems;
 
-
+unsigned int tst;
 
 void configureSensors();
 void readPlantProfiles();
@@ -110,6 +127,13 @@ void configureDrivers();
 void enableDrivers(unsigned char system_num);
 void disableDrivers(unsigned char system_num);
 void initI2c();
+void configureACLK();
+void configureUART();
+void initUART();
+void uartWrite(void *data, unsigned short size);
+void uartWriteSensors();
+void uartRead();
+void uartReadProcess();
 void readSensor(struct sensor s);
 void readFloatSensor(struct sensor s);
 void readTDSSensor(struct sensor s);
@@ -129,6 +153,9 @@ void initialize(unsigned char num_of_systems){
     configureDrivers();
     initI2c();
     configureGPIO();
+    configureACLK();
+    configureUART();
+    initUART();
 }
 
 void configureGPIO(){
@@ -332,6 +359,82 @@ void readTDSSensor(struct sensor s){
 
 }
 
+void configureACLK(){
+    CSCTL4 |= SELA_1;
+}
+
+void configureUART(){
+    UCA1CTLW0 |= UCSWRST;
+    UCA1CTLW0 |= UCMODE_0 | UCSSEL_1;
+    UCA1CTLW0 &= ~UCOS16;
+    UCA1BR0 = 3;
+    UCA1BR1 = 0;
+    UCA1MCTLW |= 0x9200;
+    UCA1CTLW0 &= ~UCSWRST;
+    UCA1IE |= UCRXIE;
+}
+
+void initUART(){
+    tx_esp_uart->mode = IDLE;
+    rx_esp_uart->mode = IDLE;
+}
+
+void uartWrite(void *data, unsigned short size){
+    if(tx_esp_uart->mode == TX){
+        tx_esp_uart->error = TX_0;
+        while(1);
+    }
+    tx_esp_uart->mode = TX;
+    //esp_uart.cmd = cmd;
+    memcpy(tx_esp_uart->data, data, size);
+    tx_esp_uart->size = size;
+    tx_esp_uart->idx=0;
+    UCA1IE |= UCTXIE;
+}
+
+void uartWriteSensors(){
+    //Sizeof sensors = 190;
+    unsigned char d[191];
+    d[0]=0; //Write Sensors CMD;
+    memcpy((d+1), sensors, 190);
+    uartWrite(d,191);
+}
+//Possible issues when we recieve while transmitting
+//LOOK OVER
+void uartRead(){
+    if(rx_esp_uart->mode==TX){
+        rx_esp_uart->error==RX_TX_0;
+        while(1);
+    }
+    if(rx_esp_uart->mode==IDLE){
+        memset(rx_esp_uart->data, 0, sizeof(rx_esp_uart->data));
+        rx_esp_uart->mode=RX;
+        rx_esp_uart->idx = 0;
+        //rx_esp_uart->error=NONE;
+        switch(UCA1RXBUF){
+        case 0:
+            rx_esp_uart->size = 191;
+            break;
+        case 'z':
+            rx_esp_uart->size = 1;
+            rx_esp_uart->error=NONE;
+            break;
+        default:
+            rx_esp_uart->error=RX_UNKNOWN;
+            rx_esp_uart->mode==IDLE;
+            break;
+            //while(1);
+        }
+    }
+    rx_esp_uart->data[rx_esp_uart->idx++];
+    if(rx_esp_uart->idx == rx_esp_uart->size && rx_esp_uart->mode==RX) uartReadProcess();
+}
+
+void uartReadProcess(){
+    unsigned char d[2] = {'h','i'};
+    uartWrite(d,2);
+}
+
 void initI2c(){
     tds_i2c.addresses[0] = 100;   //For chaining, addresses cannot be duplicate
     tds_i2c.addresses[1] = 100;
@@ -447,10 +550,9 @@ void disableDrivers(unsigned char system_num){
     }
 }
 
-//DOESNT WORK
-unsigned long msToCycles(unsigned long ms, unsigned long clock){
-    unsigned long cycles = (double)(ms*clock)/1000;
-    return cycles;
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void SYSTEM_CHECK_TIMER (void){
+
 }
 
 #pragma vector=TIMER0_B0_VECTOR
@@ -458,6 +560,44 @@ __interrupt void TIMEOUT_TIMER (void){
     switch(TB0IV){
     case TBIV__TBCCR1:
         break;
+    case TBIV__TBCCR2:
+        break;
+    case TBIV__TBCCR3:
+        break;
+    case TBIV__TBCCR4:
+        break;
+    case TBIV__TBCCR5:
+        break;
+    case TBIV__TBCCR6:
+        break;
+    }
+}
+
+#pragma vector=ADC_VECTOR
+__interrupt void ADC_ISR(void){
+    switch(__even_in_range(ADCIV,ADCIV_ADCIFG)){
 
     }
+}
+
+#pragma vector = USCI_A1_VECTOR
+__interrupt void USCI_A1_ISR(void){
+    switch(UCA1IV){
+    case 0x02: //RX Interrupt
+        uartRead();
+        break;
+    case 0x04: //TX Interrupt
+        if(tx_esp_uart->idx != tx_esp_uart->size){
+            UCA1TXBUF = tx_esp_uart->data[tx_esp_uart->idx++];
+        }else{
+            tx_esp_uart->mode = IDLE;
+            UCA1IE &= ~UCTXIE;
+        }
+        break;
+    }
+}
+
+#pragma vector = USCI_B0_VECTOR
+__interrupt void USCI_B0_ISR(void){
+
 }
